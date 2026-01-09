@@ -1,4 +1,4 @@
-package com.vbotelho.book_network.role;
+package com.vbotelho.book_network.domain.role;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

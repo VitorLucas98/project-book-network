@@ -1,6 +1,6 @@
-package com.vbotelho.book_network.token;
+package com.vbotelho.book_network.domain.token;
 
-import com.vbotelho.book_network.user.User;
+import com.vbotelho.book_network.domain.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;

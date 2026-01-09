@@ -1,7 +1,7 @@
-package com.vbotelho.book_network.role;
+package com.vbotelho.book_network.domain.role;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.vbotelho.book_network.user.User;
+import com.vbotelho.book_network.domain.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;

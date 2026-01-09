@@ -1,4 +1,4 @@
-package com.vbotelho.book_network.user;
+package com.vbotelho.book_network.domain.user;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

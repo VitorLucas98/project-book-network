@@ -1,4 +1,4 @@
-package com.vbotelho.book_network.token;
+package com.vbotelho.book_network.domain.token;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

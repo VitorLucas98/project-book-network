@@ -1,6 +1,6 @@
 package com.vbotelho.book_network.services;
 
-import com.vbotelho.book_network.user.UserRepository;
+import com.vbotelho.book_network.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
