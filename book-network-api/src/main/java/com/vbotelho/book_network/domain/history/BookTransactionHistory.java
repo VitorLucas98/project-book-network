@@ -1,7 +1,12 @@
 package com.vbotelho.book_network.domain.history;
 
 import com.vbotelho.book_network.domain.BaseEntity;
+import com.vbotelho.book_network.domain.book.Book;
+import com.vbotelho.book_network.domain.user.User;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +20,14 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @Entity
 public class BookTransactionHistory extends BaseEntity {
+
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    private User owner;
+
+    @ManyToOne
+    @JoinColumn(name = "book_id")
+    private Book book;
 
     private boolean returned;
     private boolean returnApproved;
