@@ -40,4 +40,13 @@ public class TokenService {
 
         return codeBuilder.toString();
     }
+
+    public Token findByToken(String token) {
+        return tokenRepository.findByToken(token).orElseThrow(() -> new RuntimeException("Token not found"));
+    }
+
+    public void save(Token token) {
+        tokenRepository.save(token);
+    }
+
 }

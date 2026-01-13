@@ -1,6 +1,7 @@
 package com.vbotelho.book_network.services;
 
 import com.vbotelho.book_network.domain.role.RoleRepository;
+import com.vbotelho.book_network.domain.token.Token;
 import com.vbotelho.book_network.domain.user.User;
 import com.vbotelho.book_network.domain.user.UserRepository;
 import com.vbotelho.book_network.enums.EmailTemplateName;
@@ -12,9 +13,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,5 +84,22 @@ public class AuthenticationService {
 
         var jwtToken = jwtService.generateToken(claims, (User) auth.getPrincipal());
         return new AuthenticationResponse(jwtToken);
+    }
+
+    @Transactional
+    public void activateAccount(String token) throws MessagingException {
+        var savedToken = tokenService.findByToken(token);
+        if (LocalDateTime.now().isAfter(savedToken.getExpiresAt())) {
+            sendValidationEmail(savedToken.getUser());
+            throw new RuntimeException("Activation token has expired. A new token has been send to the same email address");
+        }
+
+        var user = userRepository.findById(savedToken.getUser().getId())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        user.setEnabled(true);
+        userRepository.save(user);
+
+        savedToken.setValidatedAt(LocalDateTime.now());
+        tokenService.save(savedToken);
     }
 }
