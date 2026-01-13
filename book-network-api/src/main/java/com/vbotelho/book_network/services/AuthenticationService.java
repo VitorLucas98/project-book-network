@@ -4,14 +4,20 @@ import com.vbotelho.book_network.domain.role.RoleRepository;
 import com.vbotelho.book_network.domain.user.User;
 import com.vbotelho.book_network.domain.user.UserRepository;
 import com.vbotelho.book_network.enums.EmailTemplateName;
+import com.vbotelho.book_network.services.dto.AuthenticationRequest;
+import com.vbotelho.book_network.services.dto.AuthenticationResponse;
 import com.vbotelho.book_network.services.dto.RegistrationRequest;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +29,7 @@ public class AuthenticationService {
     private final RoleRepository roleRepository;
     private final EmailService emailService;
     private final TokenService tokenService;
+    private final AuthenticationManager authenticationManager;
 
     @Value("${application.mailing.frontend.activation-url}")
     private String activationUrl;
@@ -30,7 +37,6 @@ public class AuthenticationService {
     public void register(RegistrationRequest request) throws MessagingException {
 
         var userRole = roleRepository.findByName("USER")
-                // todo - better exception handling
                 .orElseThrow(() -> new IllegalStateException("ROLE USER was not initiated"));
 
         var user = User.builder()
@@ -58,5 +64,21 @@ public class AuthenticationService {
                 newToken,
                 "Account activation"
         );
+    }
+
+    public AuthenticationResponse authenticate(AuthenticationRequest request) {
+        var auth = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.email(),
+                        request.password()
+                )
+        );
+
+        Map<String, Object> claims = new HashMap<>();
+        var user = ((User) auth.getPrincipal());
+        claims.put("fullName", user.getFullName());
+
+        var jwtToken = jwtService.generateToken(claims, (User) auth.getPrincipal());
+        return new AuthenticationResponse(jwtToken);
     }
 }

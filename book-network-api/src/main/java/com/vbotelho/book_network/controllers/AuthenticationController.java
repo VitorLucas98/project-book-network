@@ -1,6 +1,8 @@
 package com.vbotelho.book_network.controllers;
 
 import com.vbotelho.book_network.services.AuthenticationService;
+import com.vbotelho.book_network.services.dto.AuthenticationRequest;
+import com.vbotelho.book_network.services.dto.AuthenticationResponse;
 import com.vbotelho.book_network.services.dto.RegistrationRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
@@ -26,5 +28,12 @@ public class AuthenticationController {
     ) throws MessagingException {
         service.register(request);
         return ResponseEntity.accepted().build();
+    }
+
+    @PostMapping("/authenticate")
+    public ResponseEntity<AuthenticationResponse> authenticate(
+            @RequestBody AuthenticationRequest request
+    ) {
+        return ResponseEntity.ok(service.authenticate(request));
     }
 }
