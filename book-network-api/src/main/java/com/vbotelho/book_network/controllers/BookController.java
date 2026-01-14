@@ -3,6 +3,7 @@ package com.vbotelho.book_network.controllers;
 import com.vbotelho.book_network.services.BookService;
 import com.vbotelho.book_network.services.dto.BookRequest;
 import com.vbotelho.book_network.services.dto.BookResponse;
+import com.vbotelho.book_network.services.dto.BorrowedBookResponse;
 import com.vbotelho.book_network.services.dto.PageResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -42,5 +43,13 @@ public class BookController {
             @RequestParam(name = "size", defaultValue = "10", required = false) int size,
             Authentication connectedUser) {
         return ResponseEntity.ok(service.findAllBooks(page, size, connectedUser));
+    }
+
+    @GetMapping("/owner")
+    public ResponseEntity<PageResponse<BookResponse>> findAllBooksByOwner(
+            @RequestParam(name = "page", defaultValue = "0", required = false) int page,
+            @RequestParam(name = "size", defaultValue = "10", required = false) int size,
+            Authentication connectedUser) {
+        return ResponseEntity.ok(service.findAllBooksByOwner(page, size, connectedUser));
     }
 }
