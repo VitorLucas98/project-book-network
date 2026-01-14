@@ -2,9 +2,12 @@ package com.vbotelho.book_network.services;
 
 import com.vbotelho.book_network.domain.book.Book;
 import com.vbotelho.book_network.domain.book.BookRepository;
+import com.vbotelho.book_network.domain.history.BookTransactionHistory;
+import com.vbotelho.book_network.domain.history.BookTransactionHistoryRepository;
 import com.vbotelho.book_network.domain.user.User;
 import com.vbotelho.book_network.services.dto.BookRequest;
 import com.vbotelho.book_network.services.dto.BookResponse;
+import com.vbotelho.book_network.services.dto.BorrowedBookResponse;
 import com.vbotelho.book_network.services.dto.PageResponse;
 import com.vbotelho.book_network.services.mapper.BookMapper;
 import jakarta.persistence.EntityNotFoundException;
@@ -29,6 +32,7 @@ import static com.vbotelho.book_network.domain.book.BookSpecification.withOwnerI
 public class BookService {
 
     private final BookRepository bookRepository;
+    private final BookTransactionHistoryRepository transactionHistoryRepository;
 
     public Long save(BookRequest request, Authentication connectedUser) {
         User user = ((User) connectedUser.getPrincipal());
@@ -76,6 +80,27 @@ public class BookService {
                 books.getTotalPages(),
                 books.isFirst(),
                 books.isLast()
+        );
+    }
+
+
+    public PageResponse<BorrowedBookResponse> findAllBorrowedBooks(int page, int size, Authentication connectedUser) {
+        User user = ((User) connectedUser.getPrincipal());
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
+        Page<BookTransactionHistory> allBorrowedBooks = transactionHistoryRepository.findAllBorrowedBooks(pageable, user.getId());
+
+        List<BorrowedBookResponse> booksResponse = allBorrowedBooks.stream()
+                .map(BookMapper::toBorrowedBookResponse)
+                .toList();
+
+        return new PageResponse<>(
+                booksResponse,
+                allBorrowedBooks.getNumber(),
+                allBorrowedBooks.getSize(),
+                allBorrowedBooks.getTotalElements(),
+                allBorrowedBooks.getTotalPages(),
+                allBorrowedBooks.isFirst(),
+                allBorrowedBooks.isLast()
         );
     }
 }
