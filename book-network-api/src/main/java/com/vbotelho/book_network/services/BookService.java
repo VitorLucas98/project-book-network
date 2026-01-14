@@ -9,6 +9,7 @@ import com.vbotelho.book_network.services.dto.BookRequest;
 import com.vbotelho.book_network.services.dto.BookResponse;
 import com.vbotelho.book_network.services.dto.BorrowedBookResponse;
 import com.vbotelho.book_network.services.dto.PageResponse;
+import com.vbotelho.book_network.services.exception.OperationNotPermittedException;
 import com.vbotelho.book_network.services.mapper.BookMapper;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -22,6 +23,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.vbotelho.book_network.domain.book.BookSpecification.withOwnerId;
 
@@ -120,5 +122,17 @@ public class BookService {
                 allBorrowedBooks.isFirst(),
                 allBorrowedBooks.isLast()
         );
+    }
+
+    public Long updateShareableStatus(Long bookId, Authentication connectedUser) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("No book found with ID:: " + bookId));
+        User user = ((User) connectedUser.getPrincipal());
+        if (!Objects.equals(book.getOwner().getId(), user.getId())) {
+            throw new OperationNotPermittedException("You cannot update others books shareable status");
+        }
+        book.setShareable(!book.isShareable());
+        bookRepository.save(book);
+        return bookId;
     }
 }
