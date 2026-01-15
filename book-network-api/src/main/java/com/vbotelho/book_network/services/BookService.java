@@ -191,4 +191,17 @@ public class BookService {
             throw new OperationNotPermittedException("The requested book cannot be borrowed since it is archived or not shareable");
         }
     }
+
+    public Long approveReturnBorrowedBook(Long bookId, Authentication connectedUser) {
+        Book book = findBookById(bookId);
+        validateBookAvailability(book);
+        User user = ((User) connectedUser.getPrincipal());
+        validateBookOwnerIsAuthenticatedUser(book.getOwner().getId(), user.getId());
+
+        BookTransactionHistory bookTransactionHistory = transactionHistoryRepository.findByBookIdAndOwnerId(bookId, user.getId())
+                .orElseThrow(() -> new OperationNotPermittedException("The book is not returned yet. You cannot approve its return"));
+
+        bookTransactionHistory.setReturnApproved(true);
+        return transactionHistoryRepository.save(bookTransactionHistory).getId();
+    }
 }
