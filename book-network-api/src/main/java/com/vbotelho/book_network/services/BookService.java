@@ -142,6 +142,28 @@ public class BookService {
         return bookId;
     }
 
+    public Long borrowBook(Long bookId, Authentication connectedUser) {
+        Book book = findBookById(bookId);
+        if (book.isArchived() || !book.isShareable()) {
+            throw new OperationNotPermittedException("The requested book cannot be borrowed since it is archived or not shareable");
+        }
+         User user = ((User) connectedUser.getPrincipal());
+        validateBookOwnerIsAuthenticatedUser(book.getOwner().getId(), user.getId());
+        final boolean isAlreadyBorrowed = transactionHistoryRepository.isAlreadyBorrowed(bookId, user.getId());
+        if (isAlreadyBorrowed) {
+            throw new OperationNotPermittedException("Te requested book is already borrowed");
+        }
+
+        BookTransactionHistory bookTransactionHistory = BookTransactionHistory.builder()
+                .user(user)
+                .book(book)
+                .returned(false)
+                .returnApproved(false)
+                .build();
+        return transactionHistoryRepository.save(bookTransactionHistory).getId();
+
+    }
+
     private  void validateBookOwnerIsAuthenticatedUser(Long idOwner, Long idUser){
         if(!Objects.equals(idOwner, idUser)){
             throw new OperationNotPermittedException("You cannot update others books shareable status");
