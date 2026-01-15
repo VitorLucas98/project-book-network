@@ -125,14 +125,31 @@ public class BookService {
     }
 
     public Long updateShareableStatus(Long bookId, Authentication connectedUser) {
-        Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new EntityNotFoundException("No book found with ID:: " + bookId));
+        Book book = findBookById(bookId);
         User user = ((User) connectedUser.getPrincipal());
-        if (!Objects.equals(book.getOwner().getId(), user.getId())) {
-            throw new OperationNotPermittedException("You cannot update others books shareable status");
-        }
+        validateBookOwnerIsAuthenticatedUser(book.getOwner().getId(), user.getId());
         book.setShareable(!book.isShareable());
         bookRepository.save(book);
         return bookId;
+    }
+
+    public Long updateArchivedStatus(Long bookId, Authentication connectedUser) {
+        Book book = findBookById(bookId);
+        User user = ((User) connectedUser.getPrincipal());
+        validateBookOwnerIsAuthenticatedUser(book.getOwner().getId(), user.getId());
+        book.setArchived(!book.isArchived());
+        bookRepository.save(book);
+        return bookId;
+    }
+
+    private  void validateBookOwnerIsAuthenticatedUser(Long idOwner, Long idUser){
+        if(!Objects.equals(idOwner, idUser)){
+            throw new OperationNotPermittedException("You cannot update others books shareable status");
+        }
+    }
+
+    private Book findBookById(Long bookId) {
+        return bookRepository.findById(bookId)
+                .orElseThrow(() -> new EntityNotFoundException("No book found with ID:: " + bookId));
     }
 }
