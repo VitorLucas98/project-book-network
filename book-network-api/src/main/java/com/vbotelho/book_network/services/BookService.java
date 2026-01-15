@@ -144,10 +144,8 @@ public class BookService {
 
     public Long borrowBook(Long bookId, Authentication connectedUser) {
         Book book = findBookById(bookId);
-        if (book.isArchived() || !book.isShareable()) {
-            throw new OperationNotPermittedException("The requested book cannot be borrowed since it is archived or not shareable");
-        }
-         User user = ((User) connectedUser.getPrincipal());
+        validateBookAvailability(book);
+        User user = ((User) connectedUser.getPrincipal());
         validateBookOwnerIsAuthenticatedUser(book.getOwner().getId(), user.getId());
         final boolean isAlreadyBorrowed = transactionHistoryRepository.isAlreadyBorrowed(bookId, user.getId());
         if (isAlreadyBorrowed) {
@@ -164,6 +162,19 @@ public class BookService {
 
     }
 
+    public Long returnBorrowedBook(Long bookId, Authentication connectedUser) {
+        Book book = findBookById(bookId);
+        validateBookAvailability(book);
+        User user = ((User) connectedUser.getPrincipal());
+        validateBookOwnerIsAuthenticatedUser(book.getOwner().getId(), user.getId());
+
+        BookTransactionHistory bookTransactionHistory = transactionHistoryRepository.findByBookIdAndUserId(bookId, user.getId())
+                .orElseThrow(() -> new OperationNotPermittedException("You did not borrow this book"));
+
+        bookTransactionHistory.setReturned(true);
+        return transactionHistoryRepository.save(bookTransactionHistory).getId();
+    }
+
     private  void validateBookOwnerIsAuthenticatedUser(Long idOwner, Long idUser){
         if(!Objects.equals(idOwner, idUser)){
             throw new OperationNotPermittedException("You cannot update others books shareable status");
@@ -173,5 +184,11 @@ public class BookService {
     private Book findBookById(Long bookId) {
         return bookRepository.findById(bookId)
                 .orElseThrow(() -> new EntityNotFoundException("No book found with ID:: " + bookId));
+    }
+
+    private void validateBookAvailability (Book book){
+        if (book.isArchived() || !book.isShareable()) {
+            throw new OperationNotPermittedException("The requested book cannot be borrowed since it is archived or not shareable");
+        }
     }
 }
