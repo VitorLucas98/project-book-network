@@ -177,6 +177,13 @@ public class BookService {
         return transactionHistoryRepository.save(bookTransactionHistory).getId();
     }
 
+    public void validateBook(Long bookId, Authentication connectedUser) {
+        Book book = findBookById(bookId);
+        validateBookAvailability(book);
+        User user = ((User) connectedUser.getPrincipal());
+        validateBookOwnerIsAuthenticatedUser(book.getOwner().getId(), user.getId());
+    }
+
     private  void validateBookOwnerIsAuthenticatedUser(Long idOwner, Long idUser){
         if(!Objects.equals(idOwner, idUser)){
             throw new OperationNotPermittedException("You cannot update others books shareable status");

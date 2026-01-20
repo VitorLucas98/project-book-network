@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -54,5 +55,9 @@ public class Book extends BaseEntity {
                 .orElse(0.0);
 
         return Math.round(rate * 10.0) / 10.0;
+    }
+
+    public Book(Long id) {
+        super(id);
     }
 }

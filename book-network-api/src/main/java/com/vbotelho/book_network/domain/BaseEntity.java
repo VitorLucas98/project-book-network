@@ -48,4 +48,8 @@ public class BaseEntity {
     @Column(insertable = false)
     private String lastModifiedBy;
 
+
+    public BaseEntity(Long id) {
+        this.id = id;
+    }
 }
