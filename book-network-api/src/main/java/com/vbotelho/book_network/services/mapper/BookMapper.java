@@ -5,6 +5,7 @@ import com.vbotelho.book_network.domain.history.BookTransactionHistory;
 import com.vbotelho.book_network.services.dto.BookRequest;
 import com.vbotelho.book_network.services.dto.BookResponse;
 import com.vbotelho.book_network.services.dto.BorrowedBookResponse;
+import com.vbotelho.book_network.utils.FileUtils;
 
 public class BookMapper {
     public static Book toBook(BookRequest request) {
@@ -30,7 +31,7 @@ public class BookMapper {
                 .archived(book.isArchived())
                 .shareable(book.isShareable())
                 .owner(book.getOwner().getFullName())
-                //.cover(FileUtils.readFileFromLocation(book.getBookCover()))
+                .cover(FileUtils.readFileFromLocation(book.getBookCover()))
                 .build();
     }
 
