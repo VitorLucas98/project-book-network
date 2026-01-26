@@ -17,6 +17,10 @@ const routes: Routes = [
     path: 'activate-account',
     component: ActivateAccountComponent
   },
+    {
+    path: 'books',
+    loadChildren: () => import('./use-cases/book/book.module').then(m => m.BookModule)
+  }
 ];
 
 @NgModule({
