@@ -12,4 +12,21 @@ export class TokenService {
   get token() {
     return localStorage.getItem('token') as string;
   }
+
+  clearToken() {
+    localStorage.removeItem('token');
+  }
+
+  isTokenValid() {
+    const token = this.token;
+    if (!token) {
+      return false;
+    }
+    const decodeToken = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+    const expiryTime = decodeToken.exp;
+    if (expiryTime) {
+      return ((1000 * expiryTime) - (new Date()).getTime()) > 0;
+    }
+    return false;
+  }
 }
