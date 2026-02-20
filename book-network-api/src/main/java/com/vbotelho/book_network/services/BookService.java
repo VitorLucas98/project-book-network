@@ -148,7 +148,9 @@ public class BookService {
         Book book = findBookById(bookId);
         validateBookAvailability(book);
         User user = ((User) connectedUser.getPrincipal());
-        validateBookOwnerIsAuthenticatedUser(book.getOwner().getId(), user.getId());
+        if (Objects.equals(book.getOwner().getId(), user.getId())) {
+            throw new OperationNotPermittedException("You cannot borrow your own book");
+        }
         final boolean isAlreadyBorrowed = transactionHistoryRepository.isAlreadyBorrowed(bookId, user.getId());
         if (isAlreadyBorrowed) {
             throw new OperationNotPermittedException("Te requested book is already borrowed");
