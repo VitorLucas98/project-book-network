@@ -16,6 +16,11 @@ export class BookService {
   findAll(page: number, size: number): Observable<PageResponseBookResponse> {
     return this.http.get<PageResponseBookResponse>(`${BASE_URL}?page=${page}&size=${size}`);
   }
+  
+  findAllBooksByOwner(page: number, size: number): Observable<PageResponseBookResponse> {
+    return this.http.get<PageResponseBookResponse>(`${BASE_URL}/owner?page=${page}&size=${size}`);
+  }
+
   borrowBook(bookId: number): Observable<void> {
     return this.http.post<void>(`${BASE_URL}/borrow/${bookId}`, {});
   }

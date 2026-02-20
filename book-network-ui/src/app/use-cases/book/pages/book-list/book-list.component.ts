@@ -10,7 +10,7 @@ import { BookResponse, PageResponseBookResponse } from 'src/app/services/models'
 export class BookListComponent implements OnInit {
 
   page: number = 0;
-  size: number = 3;
+  size: number = 5;
 
   books: PageResponseBookResponse = {};
    pages: any = [];
