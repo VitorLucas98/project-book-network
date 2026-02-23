@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { PageResponseBookResponse } from './models';
+import { BookRequest, PageResponseBookResponse } from './models';
 import { Observable } from 'rxjs';
 
 const BASE_URL = 'http://localhost:8081/api/v1/books';
@@ -23,5 +23,15 @@ export class BookService {
 
   borrowBook(bookId: number): Observable<void> {
     return this.http.post<void>(`${BASE_URL}/borrow/${bookId}`, {});
+  }
+
+  saveBook(bookRequest: BookRequest): Observable<number> {
+    return this.http.post<number>(`${BASE_URL}`, bookRequest);
+  }
+
+  uploadBookCoverPicture(bookId: number, file: File): Observable<void> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<void>(`${BASE_URL}/cover/${bookId}`, formData);
   }
 }
