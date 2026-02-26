@@ -27,11 +27,28 @@ export class ManageBookComponent implements OnInit {
     private activatedRoute: ActivatedRoute) { }
 
   ngOnInit(): void {
+    this.activatedRoute.params.subscribe(params => {
+      const bookId = params['bookId'];
+      if (bookId) {
+        this.bookService.findBookById(bookId).subscribe({
+          next: (book) => {
+            this.bookRequest = {
+              id: book.id,
+              title: book.title as string,
+              authorName: book.authorName as string,
+              isbn: book.isbn as string,
+              synopsis: book.synopsis as string,
+              shareable: book.shareable
+            };
+            this.selectedPicture = 'data:image/jpg;base64,' + book.cover;
+          }
+        });
+      }
+    });
   }
 
   onFileSelected(event: any) {
     this.selectedBookCover = event.target.files[0];
-    console.log(this.selectedBookCover);
 
     if (this.selectedBookCover) {
 
