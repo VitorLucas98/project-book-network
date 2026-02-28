@@ -51,10 +51,16 @@ export class BookService {
     return this.http.get<PageResponseBorrowedBookResponse>(`${BASE_URL}/borrowed?page=${page}&size=${size}`);
   }
 
+  findAllReturnedBooks(page: number, size: number): Observable<PageResponseBorrowedBookResponse> {
+    return this.http.get<PageResponseBorrowedBookResponse>(`${BASE_URL}/returned?page=${page}&size=${size}`);
+  }
+
   returnBorrowBook(bookId: number): Observable<void> {
     return this.http.patch<void>(`${BASE_URL}/borrow/return/${bookId}`, {});
   }
 
-  
+  approveReturnBorrowBook(bookId: number): Observable<void> {
+    return this.http.patch<void>(`${BASE_URL}/borrow/return/approve/${bookId}`, {});
+  }
   
 }

@@ -209,8 +209,8 @@ public class BookService {
         Book book = findBookById(bookId);
         validateBookAvailability(book);
         User user = ((User) connectedUser.getPrincipal());
-        if(Objects.equals(book.getOwner().getId(), user.getId())){
-            throw new OperationNotPermittedException("You cannot update the sharing status of your books.");
+        if(!Objects.equals(book.getOwner().getId(), user.getId())){
+            throw new OperationNotPermittedException("You cannot return a book that you do not own.");
         }
 
         BookTransactionHistory bookTransactionHistory = transactionHistoryRepository.findByBookIdAndOwnerId(bookId, user.getId())
