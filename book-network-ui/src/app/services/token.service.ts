@@ -22,11 +22,33 @@ export class TokenService {
     if (!token) {
       return false;
     }
-    const decodeToken = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+    const decodeToken = this.decodePayload(token);
+    if (!decodeToken) {
+      return false;
+    }
     const expiryTime = decodeToken.exp;
     if (expiryTime) {
       return ((1000 * expiryTime) - (new Date()).getTime()) > 0;
     }
     return false;
   }
+
+  private decodePayload(token: string): any {
+    try {
+      return JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+    } catch (e) {
+      return null;
+    }
+  }
+
+  get fullName() {
+    const token = this.token;
+    if (token) {
+      const decodedToken = this.decodePayload(token);
+      return decodedToken?.fullName || "";
+    }
+    return "";
+  }
+
+  
 }

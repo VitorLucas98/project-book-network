@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BookRequest, BookResponse, PageResponseBookResponse } from './models';
+import { BookRequest, BookResponse, PageResponseBookResponse, PageResponseBorrowedBookResponse } from './models';
 import { Observable } from 'rxjs';
 
 const BASE_URL = 'http://localhost:8081/api/v1/books';
@@ -46,5 +46,15 @@ export class BookService {
   updateArchivedStatus(bookId: number): Observable<void> {
     return this.http.patch<void>(`${BASE_URL}/archived/${bookId}`, {});
   }
+
+  findAllBorrowedBooks(page: number, size: number): Observable<PageResponseBorrowedBookResponse> {
+    return this.http.get<PageResponseBorrowedBookResponse>(`${BASE_URL}/borrowed?page=${page}&size=${size}`);
+  }
+
+  returnBorrowBook(bookId: number): Observable<void> {
+    return this.http.patch<void>(`${BASE_URL}/borrow/return/${bookId}`, {});
+  }
+
+  
   
 }

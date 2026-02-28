@@ -129,7 +129,7 @@ public class BookService {
     public Long updateShareableStatus(Long bookId, Authentication connectedUser) {
         Book book = findBookById(bookId);
         User user = ((User) connectedUser.getPrincipal());
-        validateBookOwnerIsAuthenticatedUser(book.getOwner().getId(), user.getId());
+        validateBookOwnerIsAuthenticatedUser(book.getOwner().getId(), user.getId(), false);
         book.setShareable(!book.isShareable());
         bookRepository.save(book);
         return bookId;
@@ -138,7 +138,7 @@ public class BookService {
     public Long updateArchivedStatus(Long bookId, Authentication connectedUser) {
         Book book = findBookById(bookId);
         User user = ((User) connectedUser.getPrincipal());
-        validateBookOwnerIsAuthenticatedUser(book.getOwner().getId(), user.getId());
+        validateBookOwnerIsAuthenticatedUser(book.getOwner().getId(), user.getId(), false);
         book.setArchived(!book.isArchived());
         bookRepository.save(book);
         return bookId;
@@ -170,7 +170,9 @@ public class BookService {
         Book book = findBookById(bookId);
         validateBookAvailability(book);
         User user = ((User) connectedUser.getPrincipal());
-        validateBookOwnerIsAuthenticatedUser(book.getOwner().getId(), user.getId());
+        if(Objects.equals(book.getOwner().getId(), user.getId())){
+            throw new OperationNotPermittedException("You cannot update others books shareable status");
+        }
 
         BookTransactionHistory bookTransactionHistory = transactionHistoryRepository.findByBookIdAndUserId(bookId, user.getId())
                 .orElseThrow(() -> new OperationNotPermittedException("You did not borrow this book"));
@@ -183,11 +185,11 @@ public class BookService {
         Book book = findBookById(bookId);
         validateBookAvailability(book);
         User user = ((User) connectedUser.getPrincipal());
-        validateBookOwnerIsAuthenticatedUser(book.getOwner().getId(), user.getId());
+        validateBookOwnerIsAuthenticatedUser(book.getOwner().getId(), user.getId(), true);
     }
 
-    private  void validateBookOwnerIsAuthenticatedUser(Long idOwner, Long idUser){
-        if(!Objects.equals(idOwner, idUser)){
+    private  void validateBookOwnerIsAuthenticatedUser(Long idOwner, Long idUser, boolean ownerEqualsAuthenticatedUser){
+        if(ownerEqualsAuthenticatedUser == Objects.equals(idOwner, idUser)){
             throw new OperationNotPermittedException("You cannot update others books shareable status");
         }
     }
@@ -207,7 +209,9 @@ public class BookService {
         Book book = findBookById(bookId);
         validateBookAvailability(book);
         User user = ((User) connectedUser.getPrincipal());
-        validateBookOwnerIsAuthenticatedUser(book.getOwner().getId(), user.getId());
+        if(Objects.equals(book.getOwner().getId(), user.getId())){
+            throw new OperationNotPermittedException("You cannot update the sharing status of your books.");
+        }
 
         BookTransactionHistory bookTransactionHistory = transactionHistoryRepository.findByBookIdAndOwnerId(bookId, user.getId())
                 .orElseThrow(() -> new OperationNotPermittedException("The book is not returned yet. You cannot approve its return"));

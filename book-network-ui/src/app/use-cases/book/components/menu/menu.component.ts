@@ -8,6 +8,7 @@ import { TokenService } from 'src/app/services/token.service';
   styleUrls: ['./menu.component.scss']
 })
 export class MenuComponent implements OnInit {
+  userLoggedIn: string = "";
 
   constructor(
     private tokenService: TokenService,
@@ -15,6 +16,7 @@ export class MenuComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.userLoggedIn = this.tokenService.fullName.split(' ')[0];
     const linkColor = document.querySelectorAll('.nav-link');
       linkColor.forEach(link => {
         if (window.location.href.endsWith(link.getAttribute('href') || '')) {
