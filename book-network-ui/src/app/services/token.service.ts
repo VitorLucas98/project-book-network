@@ -30,7 +30,11 @@ export class TokenService {
     if (expiryTime) {
       return ((1000 * expiryTime) - (new Date()).getTime()) > 0;
     }
-    return false;
+    return true;
+  }
+  
+  isTokenNotValid() {
+    return !this.isTokenValid();
   }
 
   private decodePayload(token: string): any {
